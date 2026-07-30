@@ -57,8 +57,13 @@
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Modele</label>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <button onclick="selectModel('kokoro')" id="btn-kokoro"
+                <button onclick="selectModel('k2fsa')" id="btn-k2fsa"
                     class="model-btn p-4 rounded-xl border-2 border-primary-500 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 transition-all duration-200 text-left">
+                    <div class="font-semibold text-sm">K2-FSA</div>
+                    <div class="text-xs opacity-75 mt-1">40+ langues, CPU</div>
+                </button>
+                <button onclick="selectModel('kokoro')" id="btn-kokoro"
+                    class="model-btn p-4 rounded-xl border-2 border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300 transition-all duration-200 text-left">
                     <div class="font-semibold text-sm">Kokoro-TTS</div>
                     <div class="text-xs opacity-75 mt-1">Multilingue, 16 voix</div>
                 </button>
@@ -72,11 +77,6 @@
                     <div class="font-semibold text-sm">KittenTTS <span class="text-xs opacity-60">(EN)</span></div>
                     <div class="text-xs opacity-75 mt-1">Ultra-rapide, 15M-80M</div>
                 </button>
-                <button onclick="selectModel('inflect')" id="btn-inflect"
-                    class="model-btn p-4 rounded-xl border-2 border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300 transition-all duration-200 text-left">
-                    <div class="font-semibold text-sm">Inflect-TTS <span class="text-xs opacity-60">(EN)</span></div>
-                    <div class="text-xs opacity-75 mt-1">Minimaliste, 4M-9M</div>
-                </button>
             </div>
         </div>
 
@@ -87,8 +87,66 @@
                 class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all resize-none"
                 placeholder="Entrez votre texte ici...">Bonjour, comment allez-vous aujourd'hui?</textarea>
 
+            <!-- K2-FSA options -->
+            <div id="k2fsa-options" class="mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="k2fsa-language" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Langue</label>
+                        <select id="k2fsa-language" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
+                            <option value="English" selected>English</option>
+                            <option value="French">Francais</option>
+                            <option value="German">Deutsch</option>
+                            <option value="Spanish">Espanol</option>
+                            <option value="Portuguese">Portugues</option>
+                            <option value="Italian">Italiano</option>
+                            <option value="Russian">Russkiy</option>
+                            <option value="Chinese (Mandarin, \u666e\u901a\u8bdd)">Zhongwen</option>
+                            <option value="Japanese">Nihongo</option>
+                            <option value="Korean">Hangungmal</option>
+                            <option value="Arabic">Arabiyya</option>
+                            <option value="Hindi">Hindi</option>
+                            <option value="Dutch">Nederlands</option>
+                            <option value="Polish">Polski</option>
+                            <option value="Swedish">Svenska</option>
+                            <option value="Turkish">Turkce</option>
+                            <option value="Czech">Cestina</option>
+                            <option value="Danish">Dansk</option>
+                            <option value="Finnish">Suomi</option>
+                            <option value="Greek">Ellinika</option>
+                            <option value="Hungarian">Magyar</option>
+                            <option value="Indonesian">Indonesia</option>
+                            <option value="Norwegian">Norsk</option>
+                            <option value="Romanian">Romana</option>
+                            <option value="Ukrainian">Ukrayinska</option>
+                            <option value="Vietnamese">Tieng Viet</option>
+                            <option value="Bulgarian">Balgarski</option>
+                            <option value="Catalan">Catala</option>
+                            <option value="Croatian">Hrvatski</option>
+                            <option value="Estonian">Eesti</option>
+                            <option value="Lithuanian">Lietuviu</option>
+                            <option value="Slovak">Slovencina</option>
+                            <option value="Slovenian">Slovenscina</option>
+                            <option value="Swahili">Kiswahili</option>
+                            <option value="Bengali">Bangla</option>
+                            <option value="Persian">Farsi</option>
+                            <option value="Thai">Thai</option>
+                            <option value="Welsh">Cymraeg</option>
+                            <option value="Basque">Euskara</option>
+                            <option value="Kurdish">Kurdî</option>
+                            <option value="Urdu">Urdu</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="k2fsa-speed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Speed <span id="k2fsa-speed-value" class="text-primary-500">1.0</span></label>
+                        <input type="range" id="k2fsa-speed" min="0.1" max="10.0" step="0.1" value="1.0"
+                            class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                            oninput="document.getElementById('k2fsa-speed-value').textContent = this.value">
+                    </div>
+                </div>
+            </div>
+
             <!-- Kokoro options -->
-            <div id="kokoro-options" class="mt-4">
+            <div id="kokoro-options" class="hidden mt-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label for="kokoro-voice" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Voice</label>
@@ -186,37 +244,6 @@
                 </div>
             </div>
 
-            <!-- Inflect options -->
-            <div id="inflect-options" class="hidden mt-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="inflect-model" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Modele</label>
-                        <select id="inflect-model" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
-                            <option value="Inflect Nano v2 (4M)">Nano v2 (4M)</option>
-                            <option value="Inflect Micro v2 (9M)">Micro v2 (9M)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="inflect-speed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Speed <span id="inflect-speed-value" class="text-primary-500">1.0</span></label>
-                        <input type="range" id="inflect-speed" min="0.5" max="2.0" step="0.1" value="1.0"
-                            class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-primary-500"
-                            oninput="document.getElementById('inflect-speed-value').textContent = this.value">
-                    </div>
-                    <div>
-                        <label for="inflect-variation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Variation <span id="inflect-variation-value" class="text-primary-500">0.667</span></label>
-                        <input type="range" id="inflect-variation" min="0.0" max="1.0" step="0.01" value="0.667"
-                            class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-primary-500"
-                            oninput="document.getElementById('inflect-variation-value').textContent = this.value">
-                    </div>
-                    <div>
-                        <label for="inflect-pitch" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Pitch <span id="inflect-pitch-value" class="text-primary-500">0.0</span></label>
-                        <input type="range" id="inflect-pitch" min="-10.0" max="10.0" step="1.0" value="0.0"
-                            class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-primary-500"
-                            oninput="document.getElementById('inflect-pitch-value').textContent = this.value">
-                    </div>
-                </div>
-            </div>
-
             <!-- Generate button -->
             <button onclick="generate()" id="btn-generate"
                 class="mt-6 w-full py-3 px-6 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-semibold rounded-xl shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2">
@@ -243,9 +270,17 @@
         <!-- Result -->
         <div id="result" class="hidden mb-6 fade-in">
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                <div class="flex items-center gap-2 mb-4">
-                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Audio genere</span>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Audio genere</span>
+                    </div>
+                    <button onclick="downloadAudio()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Telecharger
+                    </button>
                 </div>
                 <audio id="audio-player" controls class="w-full"></audio>
             </div>
@@ -265,7 +300,8 @@
     </main>
 
     <script>
-        let currentModel = 'kokoro';
+        let currentModel = 'k2fsa';
+        let currentAudioUrl = null;
 
         // Dark mode
         const html = document.documentElement;
@@ -292,10 +328,19 @@
             active.classList.remove('border-gray-200', 'dark:border-gray-600', 'text-gray-700', 'dark:text-gray-300');
             active.classList.add('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/30', 'text-primary-700', 'dark:text-primary-300');
 
+            document.getElementById('k2fsa-options').classList.toggle('hidden', model !== 'k2fsa');
             document.getElementById('kokoro-options').classList.toggle('hidden', model !== 'kokoro');
             document.getElementById('neutts-options').classList.toggle('hidden', model !== 'neutts');
             document.getElementById('kitten-options').classList.toggle('hidden', model !== 'kitten');
-            document.getElementById('inflect-options').classList.toggle('hidden', model !== 'inflect');
+        }
+
+        // Download
+        function downloadAudio() {
+            if (!currentAudioUrl) return;
+            const a = document.createElement('a');
+            a.href = currentAudioUrl;
+            a.download = 'generated_speech.wav';
+            a.click();
         }
 
         // Generate
@@ -318,7 +363,10 @@
             try {
                 const params = new URLSearchParams({ model: currentModel, sentence });
 
-                if (currentModel === 'kokoro') {
+                if (currentModel === 'k2fsa') {
+                    params.set('language', document.getElementById('k2fsa-language').value);
+                    params.set('speed', document.getElementById('k2fsa-speed').value);
+                } else if (currentModel === 'kokoro') {
                     params.set('voice', document.getElementById('kokoro-voice').value);
                     params.set('speed', document.getElementById('kokoro-speed').value);
                 } else if (currentModel === 'neutts') {
@@ -328,11 +376,6 @@
                     params.set('model_name', document.getElementById('kitten-model').value);
                     params.set('voice', document.getElementById('kitten-voice').value);
                     params.set('speed', document.getElementById('kitten-speed').value);
-                } else if (currentModel === 'inflect') {
-                    params.set('model_name', document.getElementById('inflect-model').value);
-                    params.set('speed', document.getElementById('inflect-speed').value);
-                    params.set('variation', document.getElementById('inflect-variation').value);
-                    params.set('pitch', document.getElementById('inflect-pitch').value);
                 }
 
                 const response = await fetch(`/say/?${params}`);
@@ -343,8 +386,8 @@
                 }
 
                 const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-                document.getElementById('audio-player').src = url;
+                currentAudioUrl = URL.createObjectURL(blob);
+                document.getElementById('audio-player').src = currentAudioUrl;
                 result.classList.remove('hidden');
             } catch (err) {
                 document.getElementById('error-message').textContent = err.message;

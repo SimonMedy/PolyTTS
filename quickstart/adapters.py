@@ -27,17 +27,25 @@ KOKORO_VOICES = {
     "bm_fable": "Fable (UK)",
 }
 
+K2FSA_LANGUAGES = [
+    "English", "French", "German", "Spanish", "Portuguese",
+    "Italian", "Russian", "Chinese (Mandarin, \u666e\u901a\u8bdd)",
+    "Japanese", "Korean", "Arabic", "Hindi",
+    "Dutch", "Polish", "Swedish", "Turkish",
+    "Czech", "Danish", "Finnish", "Greek",
+    "Hungarian", "Indonesian", "Norwegian", "Romanian",
+    "Ukrainian", "Vietnamese", "Bulgarian", "Catalan",
+    "Croatian", "Estonian", "Lithuanian", "Slovak",
+    "Slovenian", "Swahili", "Bengali", "Persian",
+    "Thai", "Welsh", "Basque", "Kurdish", "Urdu",
+]
+
 KITTEN_MODELS = [
     "Nano (15M - Fastest)",
     "Micro (40M - Balanced)",
     "Mini (80M - Best Quality)",
 ]
 KITTEN_VOICES = ["Bella", "Jasper", "Luna", "Bruno", "Rosie", "Hugo", "Kiki", "Leo"]
-
-INFLECT_MODELS = [
-    "Inflect Nano v2 (4M)",
-    "Inflect Micro v2 (9M)",
-]
 
 
 def _get_client(space_id):
@@ -65,18 +73,25 @@ def generate_kokoro(sentence, voice, speed):
         return f.read()
 
 
-def generate_kitten(sentence, model_name, voice, speed):
-    client = _get_client("KittenML/KittenTTS-Demo")
-    result = client.predict(sentence, model_name, voice, speed, api_name="/synthesize")
-    with open(result, "rb") as f:
+def generate_k2fsa(sentence, language, speed):
+    client = _get_client("k2-fsa/text-to-speech")
+    models_resp = client.predict(language, api_name="/update_model_dropdown")
+    model_value = models_resp["choices"][0][0]
+    result = client.predict(
+        language,
+        model_value,
+        sentence,
+        "0",
+        speed,
+        api_name="/process",
+    )
+    audio_path = result[0]
+    with open(audio_path, "rb") as f:
         return f.read()
 
 
-def generate_inflect(sentence, model_name, speed, variation, pitch):
-    client = _get_client("Nymbo/Inflect-TTS")
-    result = client.predict(
-        model_name, sentence, speed, variation, pitch, 0, 4000,
-        api_name="/generate_speech",
-    )
+def generate_kitten(sentence, model_name, voice, speed):
+    client = _get_client("KittenML/KittenTTS-Demo")
+    result = client.predict(sentence, model_name, voice, speed, api_name="/synthesize")
     with open(result, "rb") as f:
         return f.read()

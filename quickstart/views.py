@@ -3,27 +3,36 @@ from django.views.decorators.http import require_GET
 from quickstart.adapters import (
     generate_neutts,
     generate_kokoro,
+    generate_k2fsa,
     generate_kitten,
-    generate_inflect,
     NEUTTS_SPEAKERS,
     NEUTTS_EMOTIONS,
     KOKORO_VOICES,
+    K2FSA_LANGUAGES,
     KITTEN_MODELS,
     KITTEN_VOICES,
-    INFLECT_MODELS,
 )
 
 
 @require_GET
 def say_view(request):
-    model = request.GET.get("model", "kokoro")
+    model = request.GET.get("model", "k2fsa")
     sentence = request.GET.get("sentence", "")
 
     if not sentence:
         return HttpResponse("sentence parameter is required", status=400)
 
     try:
-        if model == "kokoro":
+        if model == "k2fsa":
+            language = request.GET.get("language", "English")
+            speed = float(request.GET.get("speed", "1.0"))
+            if language not in K2FSA_LANGUAGES:
+                return HttpResponse(f"language must be one of {K2FSA_LANGUAGES}", status=400)
+            if not 0.1 <= speed <= 10.0:
+                return HttpResponse("speed must be between 0.1 and 10.0", status=400)
+            audio_data = generate_k2fsa(sentence, language, speed)
+
+        elif model == "kokoro":
             voice = request.GET.get("voice", "af_alloy")
             speed = float(request.GET.get("speed", "1.0"))
             if voice not in KOKORO_VOICES:
@@ -53,19 +62,8 @@ def say_view(request):
                 return HttpResponse("speed must be between 0.5 and 2.0", status=400)
             audio_data = generate_kitten(sentence, model_name, voice, speed)
 
-        elif model == "inflect":
-            model_name = request.GET.get("model_name", "Inflect Nano v2 (4M)")
-            speed = float(request.GET.get("speed", "1.0"))
-            variation = float(request.GET.get("variation", "0.667"))
-            pitch = float(request.GET.get("pitch", "0.0"))
-            if model_name not in INFLECT_MODELS:
-                return HttpResponse(f"model_name must be one of {INFLECT_MODELS}", status=400)
-            if not 0.5 <= speed <= 2.0:
-                return HttpResponse("speed must be between 0.5 and 2.0", status=400)
-            audio_data = generate_inflect(sentence, model_name, speed, variation, pitch)
-
         else:
-            return HttpResponse("model must be 'kokoro', 'neutts', 'kitten' or 'inflect'", status=400)
+            return HttpResponse("model must be 'k2fsa', 'kokoro', 'neutts' or 'kitten'", status=400)
 
         return HttpResponse(audio_data, content_type="audio/wav")
 
