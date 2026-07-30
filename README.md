@@ -4,7 +4,7 @@
 
 API Django REST pour du Text-to-Speech multi-modeles, avec frontend Tailwind CSS et dark mode.
 
-## Modeles
+PolyTTS permet de generer de la synthese vocale a partir de texte en choisissant parmi 4 modeles TTS differents, chacun avec ses propres langues, voix et caracteristiques.
 
 | Modele | Langues | Voix | Infra |
 |--------|---------|------|-------|
@@ -13,24 +13,29 @@ API Django REST pour du Text-to-Speech multi-modeles, avec frontend Tailwind CSS
 | **NeuTTS-2E** | EN | 4 speakers, 7 emotions | ZeroGPU |
 | **KittenTTS** | EN | 8 voix, 3 tailles | CPU |
 
-## Fonctionnement
+## Installation
 
-```
-Frontend → GET /say/ → Django → gradio_client → HuggingFace Space → WAV
+1. Cloner le depot :
+
+```bash
+git clone https://github.com/SimonMedy/PolyTTS.git
+cd PolyTTS
 ```
 
-## Setup
+2. Creer et activer un environnement virtuel :
 
 ```bash
 python -m venv .venv
 \.venv\Scripts\activate
-pip install -r requirements.txt
-python manage.py migrate
 ```
 
-## Configuration
+3. Installer les dependances :
 
-Creer un fichier `.env` a la racine :
+```bash
+pip install -r requirements.txt
+```
+
+4. Creer un fichier `.env` a la racine avec le token HuggingFace :
 
 ```
 HF_TOKEN=ton_token_hugging_face
@@ -38,15 +43,31 @@ HF_TOKEN=ton_token_hugging_face
 
 Le token est requis pour l'acces aux HuggingFace Spaces. En creer un sur https://huggingface.co/settings/tokens
 
-## Lancement
+5. Appliquer les migrations :
+
+```bash
+python manage.py migrate
+```
+
+## Utilisation
+
+Lancer le serveur :
 
 ```bash
 python manage.py runserver 127.0.0.1:8000
 ```
 
-Ouvrir http://127.0.0.1:8000/
+Ouvrir http://127.0.0.1:8000/ dans un navigateur.
 
-## API
+### Interface
+
+- Choisir un modele TTS via les boutons en haut
+- Entrer le texte a convertir
+- Selectionner les options (langue, voix, vitesse, etc.)
+- Cliquer sur "Generer" pour lancer la synthese
+- Ecouter le resultat et le telecharger en WAV
+
+### API
 
 ```
 GET /say/?sentence=Bonjour&model=k2fsa&language=French
@@ -64,9 +85,9 @@ GET /say/?sentence=Bonjour&model=k2fsa&language=French
 
 Reponse : fichier WAV (audio/wav)
 
-
 ## Stack
 
 - Django 5.2 + Django REST Framework
 - gradio_client
 - HuggingFace Spaces (K2-FSA, Kokoro, NeuTTS, KittenTTS)
+- Tailwind CSS
