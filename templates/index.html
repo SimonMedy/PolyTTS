@@ -1,34 +1,218 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeuTTS API</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <h1>NeuTTS-2E</h1>
-        <p class="subtitle">Text-to-Speech avec emotions</p>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
 
-        <form id="tts-form">
-            <label for="sentence">Texte :</label>
-            <textarea id="sentence" rows="3" placeholder="Entrez votre texte ici...">Bonjour, comment allez-vous aujourd'hui?</textarea>
-
-            <div class="row">
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                    </svg>
+                </div>
                 <div>
-                    <label for="speaker">Speaker :</label>
-                    <select id="speaker">
-                        <option value="emily" selected>Emily</option>
+                    <h1 class="text-xl font-bold text-gray-900 dark:text-white">NeuTTS API</h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Text-to-Speech avec emotions</p>
+                </div>
+            </div>
+            <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <svg id="sun-icon" class="w-5 h-5 text-gray-600 dark:text-yellow-400 hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                </svg>
+                <svg id="moon-icon" class="w-5 h-5 text-gray-600 dark:text-gray-300 block dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-8">
+
+        <!-- Model selector -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Modele</label>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <button onclick="selectModel('k2fsa')" id="btn-k2fsa"
+                    class="model-btn p-4 rounded-xl border-2 border-primary-500 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 transition-all duration-200 text-left">
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold text-sm">K2-FSA</span>
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-bold bg-yellow-400 text-yellow-900 rounded-full">&#x1F3C6; Top</span>
+                    </div>
+                    <div class="text-xs opacity-75 mt-1">40+ langues, CPU</div>
+                </button>
+                <button onclick="selectModel('kokoro')" id="btn-kokoro"
+                    class="model-btn p-4 rounded-xl border-2 border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300 transition-all duration-200 text-left">
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold text-sm">Kokoro-TTS</span>
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-bold bg-blue-400 text-white rounded-full">&#x2B50; Rapide</span>
+                    </div>
+                    <div class="text-xs opacity-75 mt-1">16 voix, US</div>
+                </button>
+                <button onclick="selectModel('neutts')" id="btn-neutts"
+                    class="model-btn p-4 rounded-xl border-2 border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300 transition-all duration-200 text-left">
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold text-sm">NeuTTS-2E</span>
+                        <span class="text-sm" title="Anglais">&#x1F1EC;&#x1F1E7;</span>
+                    </div>
+                    <div class="text-xs opacity-75 mt-1">4 speakers, emotions</div>
+                </button>
+                <button onclick="selectModel('kitten')" id="btn-kitten"
+                    class="model-btn p-4 rounded-xl border-2 border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300 transition-all duration-200 text-left">
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold text-sm">KittenTTS</span>
+                        <span class="text-sm" title="Anglais">&#x1F1EC;&#x1F1E7;</span>
+                    </div>
+                    <div class="text-xs opacity-75 mt-1">Ultra-rapide, 15M-80M</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Input form -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+            <label for="sentence" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Texte</label>
+            <textarea id="sentence" rows="3"
+                class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all resize-none"
+                placeholder="Entrez votre texte ici...">Bonjour, comment allez-vous aujourd'hui?</textarea>
+
+            <!-- K2-FSA options -->
+            <div id="k2fsa-options" class="mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="k2fsa-language" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Langue</label>
+                        <select id="k2fsa-language" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
+                            <option value="English" selected>English</option>
+                            <option value="French">Francais</option>
+                            <option value="German">Deutsch</option>
+                            <option value="Spanish">Espanol</option>
+                            <option value="Portuguese">Portugues</option>
+                            <option value="Italian">Italiano</option>
+                            <option value="Russian">Russkiy</option>
+                            <option value="Chinese (Mandarin, \u666e\u901a\u8bdd)">Zhongwen</option>
+                            <option value="Japanese">Nihongo</option>
+                            <option value="Korean">Hangungmal</option>
+                            <option value="Arabic">Arabiyya</option>
+                            <option value="Hindi">Hindi</option>
+                            <option value="Dutch">Nederlands</option>
+                            <option value="Polish">Polski</option>
+                            <option value="Swedish">Svenska</option>
+                            <option value="Turkish">Turkce</option>
+                            <option value="Czech">Cestina</option>
+                            <option value="Danish">Dansk</option>
+                            <option value="Finnish">Suomi</option>
+                            <option value="Greek">Ellinika</option>
+                            <option value="Hungarian">Magyar</option>
+                            <option value="Indonesian">Indonesia</option>
+                            <option value="Norwegian">Norsk</option>
+                            <option value="Romanian">Romana</option>
+                            <option value="Ukrainian">Ukrayinska</option>
+                            <option value="Vietnamese">Tieng Viet</option>
+                            <option value="Bulgarian">Balgarski</option>
+                            <option value="Catalan">Catala</option>
+                            <option value="Croatian">Hrvatski</option>
+                            <option value="Estonian">Eesti</option>
+                            <option value="Lithuanian">Lietuviu</option>
+                            <option value="Slovak">Slovencina</option>
+                            <option value="Slovenian">Slovenscina</option>
+                            <option value="Swahili">Kiswahili</option>
+                            <option value="Bengali">Bangla</option>
+                            <option value="Persian">Farsi</option>
+                            <option value="Thai">Thai</option>
+                            <option value="Welsh">Cymraeg</option>
+                            <option value="Basque">Euskara</option>
+                            <option value="Kurdish">Kurdî</option>
+                            <option value="Urdu">Urdu</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="k2fsa-speed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Speed <span id="k2fsa-speed-value" class="text-primary-500">1.0</span></label>
+                        <input type="range" id="k2fsa-speed" min="0.1" max="10.0" step="0.1" value="1.0"
+                            class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                            oninput="document.getElementById('k2fsa-speed-value').textContent = this.value">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kokoro options -->
+            <div id="kokoro-options" class="hidden mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="kokoro-voice" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Voice</label>
+                        <select id="kokoro-voice" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
+                            <optgroup label="US Female">
+                                <option value="af_alloy">Alloy</option>
+                                <option value="af_aoede">Aoede</option>
+                                <option value="af_jessica">Jessica</option>
+                                <option value="af_kore">Kore</option>
+                                <option value="af_nova">Nova</option>
+                                <option value="af_river">River</option>
+                            </optgroup>
+                            <optgroup label="US Male">
+                                <option value="am_echo">Echo</option>
+                                <option value="am_eric">Eric</option>
+                                <option value="am_fenrir">Fenrir</option>
+                                <option value="am_liam">Liam</option>
+                                <option value="am_onyx">Onyx</option>
+                                <option value="am_puck">Puck</option>
+                            </optgroup>
+                            <optgroup label="UK Female">
+                                <option value="bf_alice">Alice</option>
+                                <option value="bf_lily">Lily</option>
+                            </optgroup>
+                            <optgroup label="UK Male">
+                                <option value="bm_daniel">Daniel</option>
+                                <option value="bm_fable">Fable</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="kokoro-speed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Speed <span id="kokoro-speed-value" class="text-primary-500">1.0</span></label>
+                        <input type="range" id="kokoro-speed" min="0.5" max="2.0" step="0.1" value="1.0"
+                            class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                            oninput="document.getElementById('kokoro-speed-value').textContent = this.value">
+                    </div>
+                </div>
+            </div>
+
+            <!-- NeuTTS options -->
+            <div id="neutts-options" class="hidden grid grid-cols-2 gap-4 mt-4">
+                <div>
+                    <label for="speaker" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Speaker</label>
+                    <select id="speaker" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
+                        <option value="emily">Emily</option>
                         <option value="paul">Paul</option>
                         <option value="sophie">Sophie</option>
                         <option value="steven">Steven</option>
                     </select>
                 </div>
                 <div>
-                    <label for="emotion">Emotion :</label>
-                    <select id="emotion">
-                        <option value="neutral" selected>Neutral</option>
+                    <label for="emotion" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Emotion</label>
+                    <select id="emotion" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
+                        <option value="neutral">Neutral</option>
                         <option value="happy">Happy</option>
                         <option value="sad">Sad</option>
                         <option value="angry">Angry</option>
@@ -39,64 +223,193 @@
                 </div>
             </div>
 
-            <button type="submit" id="btn-generate">Generer</button>
-        </form>
+            <!-- KittenTTS options -->
+            <div id="kitten-options" class="hidden mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="kitten-model" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Modele</label>
+                        <select id="kitten-model" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
+                            <option value="Nano (15M - Fastest)">Nano (15M - Fastest)</option>
+                            <option value="Micro (40M - Balanced)" selected>Micro (40M - Balanced)</option>
+                            <option value="Mini (80M - Best Quality)">Mini (80M - Best Quality)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="kitten-voice" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Voice</label>
+                        <select id="kitten-voice" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
+                            <option value="Bella">Bella</option>
+                            <option value="Jasper" selected>Jasper</option>
+                            <option value="Luna">Luna</option>
+                            <option value="Bruno">Bruno</option>
+                            <option value="Rosie">Rosie</option>
+                            <option value="Hugo">Hugo</option>
+                            <option value="Kiki">Kiki</option>
+                            <option value="Leo">Leo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="kitten-speed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Speed <span id="kitten-speed-value" class="text-primary-500">1.0</span></label>
+                        <input type="range" id="kitten-speed" min="0.5" max="2.0" step="0.1" value="1.0"
+                            class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                            oninput="document.getElementById('kitten-speed-value').textContent = this.value">
+                    </div>
+                </div>
+            </div>
 
-        <div id="result" class="hidden">
-            <audio id="audio-player" controls></audio>
+            <!-- Generate button -->
+            <button onclick="generate()" id="btn-generate"
+                class="mt-6 w-full py-3 px-6 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-semibold rounded-xl shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2">
+                <svg id="btn-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                </svg>
+                <span id="btn-text">Generer</span>
+            </button>
         </div>
 
-        <div id="loading" class="hidden">
-            <p>Generation en cours...</p>
+        <!-- Loading -->
+        <div id="loading" class="hidden mb-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 text-center">
+                <div class="inline-flex items-center gap-3">
+                    <div class="relative">
+                        <div class="w-8 h-8 border-4 border-primary-200 dark:border-primary-800 rounded-full"></div>
+                        <div class="w-8 h-8 border-4 border-primary-500 rounded-full border-t-transparent animate-spin absolute top-0 left-0"></div>
+                    </div>
+                    <span class="text-gray-600 dark:text-gray-300">Generation en cours...</span>
+                </div>
+            </div>
         </div>
 
-        <div id="error" class="hidden">
-            <p id="error-message"></p>
+        <!-- Result -->
+        <div id="result" class="hidden mb-6 fade-in">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Audio genere</span>
+                    </div>
+                    <button onclick="downloadAudio()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Telecharger
+                    </button>
+                </div>
+                <audio id="audio-player" controls class="w-full"></audio>
+            </div>
         </div>
-    </div>
+
+        <!-- Error -->
+        <div id="error" class="hidden mb-6">
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-6">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span id="error-message" class="text-red-700 dark:text-red-400"></span>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <script>
-        const form = document.getElementById("tts-form");
-        const audioPlayer = document.getElementById("audio-player");
-        const resultDiv = document.getElementById("result");
-        const loadingDiv = document.getElementById("loading");
-        const errorDiv = document.getElementById("error");
-        const errorMessage = document.getElementById("error-message");
-        const btnGenerate = document.getElementById("btn-generate");
+        let currentModel = 'k2fsa';
+        let currentAudioUrl = null;
 
-        form.addEventListener("submit", async (e) => {
-            e.preventDefault();
+        // Dark mode
+        const html = document.documentElement;
+        const themeToggle = document.getElementById('theme-toggle');
 
-            const sentence = document.getElementById("sentence").value;
-            const speaker = document.getElementById("speaker").value;
-            const emotion = document.getElementById("emotion").value;
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
 
-            resultDiv.classList.add("hidden");
-            errorDiv.classList.add("hidden");
-            loadingDiv.classList.remove("hidden");
-            btnGenerate.disabled = true;
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // Model selection
+        function selectModel(model) {
+            currentModel = model;
+            document.querySelectorAll('.model-btn').forEach(btn => {
+                btn.classList.remove('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/30', 'text-primary-700', 'dark:text-primary-300');
+                btn.classList.add('border-gray-200', 'dark:border-gray-600', 'text-gray-700', 'dark:text-gray-300');
+            });
+            const active = document.getElementById(`btn-${model}`);
+            active.classList.remove('border-gray-200', 'dark:border-gray-600', 'text-gray-700', 'dark:text-gray-300');
+            active.classList.add('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/30', 'text-primary-700', 'dark:text-primary-300');
+
+            document.getElementById('k2fsa-options').classList.toggle('hidden', model !== 'k2fsa');
+            document.getElementById('kokoro-options').classList.toggle('hidden', model !== 'kokoro');
+            document.getElementById('neutts-options').classList.toggle('hidden', model !== 'neutts');
+            document.getElementById('kitten-options').classList.toggle('hidden', model !== 'kitten');
+        }
+
+        // Download
+        function downloadAudio() {
+            if (!currentAudioUrl) return;
+            const a = document.createElement('a');
+            a.href = currentAudioUrl;
+            a.download = 'generated_speech.wav';
+            a.click();
+        }
+
+        // Generate
+        async function generate() {
+            const sentence = document.getElementById('sentence').value;
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const error = document.getElementById('error');
+            const btn = document.getElementById('btn-generate');
+            const btnText = document.getElementById('btn-text');
+
+            if (!sentence.trim()) return;
+
+            result.classList.add('hidden');
+            error.classList.add('hidden');
+            loading.classList.remove('hidden');
+            btn.disabled = true;
+            btnText.textContent = 'Generation...';
 
             try {
-                const params = new URLSearchParams({ sentence, speaker, emotion });
+                const params = new URLSearchParams({ model: currentModel, sentence });
+
+                if (currentModel === 'k2fsa') {
+                    params.set('language', document.getElementById('k2fsa-language').value);
+                    params.set('speed', document.getElementById('k2fsa-speed').value);
+                } else if (currentModel === 'kokoro') {
+                    params.set('voice', document.getElementById('kokoro-voice').value);
+                    params.set('speed', document.getElementById('kokoro-speed').value);
+                } else if (currentModel === 'neutts') {
+                    params.set('speaker', document.getElementById('speaker').value);
+                    params.set('emotion', document.getElementById('emotion').value);
+                } else if (currentModel === 'kitten') {
+                    params.set('model_name', document.getElementById('kitten-model').value);
+                    params.set('voice', document.getElementById('kitten-voice').value);
+                    params.set('speed', document.getElementById('kitten-speed').value);
+                }
+
                 const response = await fetch(`/say/?${params}`);
 
                 if (!response.ok) {
                     const text = await response.text();
-                    throw new Error(text || "Erreur inconnue");
+                    throw new Error(text || 'Erreur inconnue');
                 }
 
                 const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-                audioPlayer.src = url;
-                resultDiv.classList.remove("hidden");
+                currentAudioUrl = URL.createObjectURL(blob);
+                document.getElementById('audio-player').src = currentAudioUrl;
+                result.classList.remove('hidden');
             } catch (err) {
-                errorMessage.textContent = err.message;
-                errorDiv.classList.remove("hidden");
+                document.getElementById('error-message').textContent = err.message;
+                error.classList.remove('hidden');
             } finally {
-                loadingDiv.classList.add("hidden");
-                btnGenerate.disabled = false;
+                loading.classList.add('hidden');
+                btn.disabled = false;
+                btnText.textContent = 'Generer';
             }
-        });
+        }
     </script>
 </body>
 </html>
