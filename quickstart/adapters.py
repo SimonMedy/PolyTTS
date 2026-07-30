@@ -1,3 +1,4 @@
+import os
 from django.conf import settings
 from gradio_client import Client
 
@@ -8,23 +9,39 @@ NEUTTS_EMOTIONS = [
     "happy", "sad", "surprised", "neutral",
 ]
 
+# Change this to your duplicated hexgrad/Kokoro-TTS space name
+# e.g. "your-username/Kokoro-TTS" — CPU, unlimited, no quota
+KOKORO_SPACE = os.environ.get("KOKORO_SPACE", "Yxtomix/Kokoro-TTS")
+
 KOKORO_VOICES = {
-    "af_alloy": "Alloy (US)",
+    "af_heart": "Heart (US)",
+    "af_bella": "Bella (US)",
+    "af_nicole": "Nicole (US)",
     "af_aoede": "Aoede (US)",
-    "af_jessica": "Jessica (US)",
     "af_kore": "Kore (US)",
+    "af_sarah": "Sarah (US)",
     "af_nova": "Nova (US)",
+    "af_sky": "Sky (US)",
+    "af_alloy": "Alloy (US)",
+    "af_jessica": "Jessica (US)",
     "af_river": "River (US)",
+    "am_michael": "Michael (US)",
+    "am_fenrir": "Fenrir (US)",
+    "am_puck": "Puck (US)",
     "am_echo": "Echo (US)",
     "am_eric": "Eric (US)",
-    "am_fenrir": "Fenrir (US)",
     "am_liam": "Liam (US)",
     "am_onyx": "Onyx (US)",
-    "am_puck": "Puck (US)",
+    "am_santa": "Santa (US)",
+    "am_adam": "Adam (US)",
+    "bf_emma": "Emma (UK)",
+    "bf_isabella": "Isabella (UK)",
     "bf_alice": "Alice (UK)",
     "bf_lily": "Lily (UK)",
-    "bm_daniel": "Daniel (UK)",
+    "bm_george": "George (UK)",
     "bm_fable": "Fable (UK)",
+    "bm_lewis": "Lewis (UK)",
+    "bm_daniel": "Daniel (UK)",
 }
 
 K2FSA_LANGUAGES = [
@@ -61,14 +78,25 @@ def generate_neutts(sentence, speaker, emotion):
 
 
 def generate_kokoro(sentence, voice, speed):
-    client = _get_client("Remsky/Kokoro-TTS-Zero")
-    result = client.predict(
-        sentence,
-        [voice],
-        speed,
-        api_name="/generate_speech_from_ui",
-    )
-    audio_path = result[0] if isinstance(result, tuple) else result
+    client = _get_client(KOKORO_SPACE)
+
+    if KOKORO_SPACE != "Remsky/Kokoro-TTS-Zero":
+        result = client.predict(
+            sentence,
+            voice,
+            speed,
+            False,
+            api_name="/generate_first",
+        )
+    else:
+        result = client.predict(
+            sentence,
+            [voice],
+            speed,
+            api_name="/generate_speech_from_ui",
+        )
+
+    audio_path = result[0] if isinstance(result, (list, tuple)) else result
     with open(audio_path, "rb") as f:
         return f.read()
 
