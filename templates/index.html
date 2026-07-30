@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuTTS API</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>NeuTTS-2E</h1>
+        <p class="subtitle">Text-to-Speech avec emotions</p>
+
+        <form id="tts-form">
+            <label for="sentence">Texte :</label>
+            <textarea id="sentence" rows="3" placeholder="Entrez votre texte ici...">Bonjour, comment allez-vous aujourd'hui?</textarea>
+
+            <div class="row">
+                <div>
+                    <label for="speaker">Speaker :</label>
+                    <select id="speaker">
+                        <option value="emily" selected>Emily</option>
+                        <option value="paul">Paul</option>
+                        <option value="sophie">Sophie</option>
+                        <option value="steven">Steven</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="emotion">Emotion :</label>
+                    <select id="emotion">
+                        <option value="neutral" selected>Neutral</option>
+                        <option value="happy">Happy</option>
+                        <option value="sad">Sad</option>
+                        <option value="angry">Angry</option>
+                        <option value="surprised">Surprised</option>
+                        <option value="disgusted">Disgusted</option>
+                        <option value="fearful">Fearful</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" id="btn-generate">Generer</button>
+        </form>
+
+        <div id="result" class="hidden">
+            <audio id="audio-player" controls></audio>
+        </div>
+
+        <div id="loading" class="hidden">
+            <p>Generation en cours...</p>
+        </div>
+
+        <div id="error" class="hidden">
+            <p id="error-message"></p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById("tts-form");
+        const audioPlayer = document.getElementById("audio-player");
+        const resultDiv = document.getElementById("result");
+        const loadingDiv = document.getElementById("loading");
+        const errorDiv = document.getElementById("error");
+        const errorMessage = document.getElementById("error-message");
+        const btnGenerate = document.getElementById("btn-generate");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const sentence = document.getElementById("sentence").value;
+            const speaker = document.getElementById("speaker").value;
+            const emotion = document.getElementById("emotion").value;
+
+            resultDiv.classList.add("hidden");
+            errorDiv.classList.add("hidden");
+            loadingDiv.classList.remove("hidden");
+            btnGenerate.disabled = true;
+
+            try {
+                const params = new URLSearchParams({ sentence, speaker, emotion });
+                const response = await fetch(`/say/?${params}`);
+
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(text || "Erreur inconnue");
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                audioPlayer.src = url;
+                resultDiv.classList.remove("hidden");
+            } catch (err) {
+                errorMessage.textContent = err.message;
+                errorDiv.classList.remove("hidden");
+            } finally {
+                loadingDiv.classList.add("hidden");
+                btnGenerate.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
