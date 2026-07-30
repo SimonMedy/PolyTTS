@@ -1,6 +1,6 @@
 # PolyTTS
 
-![Frontend](assets/image.png)
+![Frontend](assets/image2.png)
 
 API Django REST pour du Text-to-Speech multi-modeles, avec frontend Tailwind CSS et dark mode.
 
