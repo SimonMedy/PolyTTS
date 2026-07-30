@@ -1,5 +1,7 @@
 # NeuTTS-API
 
+![Frontend](assets/image.png)
+
 API Django REST pour du Text-to-Speech avec emotions, utilisant le modele [NeuTTS-2E](https://huggingface.co/neuphonic/neutts-2e) sur HuggingFace.
 
 ## Fonctionnement
