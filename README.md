@@ -64,6 +64,7 @@ GET /say/?sentence=Bonjour&model=k2fsa&language=French
 
 Reponse : fichier WAV (audio/wav)
 
+
 ## Stack
 
 - Django 5.2 + Django REST Framework
